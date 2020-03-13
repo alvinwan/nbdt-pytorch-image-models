@@ -139,6 +139,9 @@ def validate(args):
     top5 = AverageMeter()
 
     from nbdt.analysis import SoftEmbeddedDecisionRules
+    path_graph = 'data/imagenet-1000/graph-induced-efficientnet_b7b.json'
+    path_wnids = 'data/imagenet-1000/wnids.txt'
+    loader.dataset.classes = [f'n{i}' for i in range(1000)]
     analyzer = SoftEmbeddedDecisionRules(loader.dataset, None, path_graph, path_wnids)
     analyzer.start_epoch(0)
 
@@ -198,6 +201,7 @@ def validate(args):
 
     if args.nbdt:
         analyzer.end_epoch(0)
+        analyzer.end_test(0)
 
     return results
 
