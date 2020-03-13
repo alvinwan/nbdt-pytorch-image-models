@@ -435,8 +435,8 @@ def main():
     path_graph = 'data/imagenet-1000/graph-induced-efficientnet_b7b.json'
     path_wnids = 'data/imagenet-1000/wnids.txt'
     classes = [f'n{i}' for i in range(1000)]
-    train_loss_fn = SoftTreeSupLoss(path_graph, path_wnids, classes, criterion=train_loss_fn, tree_supervision_weight=10)
-    validate_loss_fn = SoftTreeSupLoss(path_graph, path_wnids, classes, criterion=validate_loss_fn, tree_supervision_weight=10)
+    train_loss_fn = SoftTreeSupLoss(path_graph, path_wnids, classes, criterion=train_loss_fn, tree_supervision_weight=100)
+    validate_loss_fn = SoftTreeSupLoss(path_graph, path_wnids, classes, criterion=validate_loss_fn, tree_supervision_weight=100)
 
     eval_metric = args.eval_metric
     best_metric = None

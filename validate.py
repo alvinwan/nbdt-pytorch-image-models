@@ -72,9 +72,6 @@ parser.add_argument('--torchscript', dest='torchscript', action='store_true',
 parser.add_argument('--results-file', default='', type=str, metavar='FILENAME',
                     help='Output csv file for validation results (summary)')
 
-# running inference with nbdt
-parser.add_argument('--nbdt', action='store_true', help='Run NBDT inference')
-
 
 def validate(args):
     # might as well try to validate something
@@ -160,11 +157,9 @@ def validate(args):
             loss = criterion(output, target)
 
             # run analyzer
-            extra = ''
-            if args.nbdt:
-                _, predicted = output.max(1)
-                stat = analyzer.update_batch(output, predicted, target)
-                extra = f'| {stat}' if stat else ''
+            _, predicted = output.max(1)
+            stat = analyzer.update_batch(output, predicted, target)
+            extra = f'| {stat}' if stat else ''
 
             # measure accuracy and record loss
             prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
@@ -199,9 +194,8 @@ def validate(args):
     logging.info(' * Prec@1 {:.3f} ({:.3f}) Prec@5 {:.3f} ({:.3f})'.format(
        results['top1'], results['top1_err'], results['top5'], results['top5_err']))
 
-    if args.nbdt:
-        analyzer.end_epoch(0)
-        analyzer.end_test(0)
+    analyzer.end_epoch(0)
+    analyzer.end_test(0)
 
     return results
 
