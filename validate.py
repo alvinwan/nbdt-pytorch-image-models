@@ -72,6 +72,9 @@ parser.add_argument('--torchscript', dest='torchscript', action='store_true',
 parser.add_argument('--results-file', default='', type=str, metavar='FILENAME',
                     help='Output csv file for validation results (summary)')
 
+# running inference with nbdt
+parser.add_argument('--nbdt', action='store_true', help='Run NBDT inference')
+
 
 def validate(args):
     # might as well try to validate something
@@ -135,6 +138,10 @@ def validate(args):
     top1 = AverageMeter()
     top5 = AverageMeter()
 
+    from nbdt.analysis import SoftEmbeddedDecisionRules
+    analyzer = SoftEmbeddedDecisionRules(loader.dataset, None, path_graph, path_wnids)
+    analyzer.start_epoch(0)
+
     model.eval()
     end = time.time()
     with torch.no_grad():
@@ -148,6 +155,13 @@ def validate(args):
             # compute output
             output = model(input)
             loss = criterion(output, target)
+
+            # run analyzer
+            extra = ''
+            if args.nbdt:
+                _, predicted = output.max(1)
+                stat = analyzer.update_batch(output, predicted, target)
+                extra = f'| {stat}' if stat else ''
 
             # measure accuracy and record loss
             prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
@@ -165,10 +179,11 @@ def validate(args):
                     'Time: {batch_time.val:.3f}s ({batch_time.avg:.3f}s, {rate_avg:>7.2f}/s)  '
                     'Loss: {loss.val:>7.4f} ({loss.avg:>6.4f})  '
                     'Prec@1: {top1.val:>7.3f} ({top1.avg:>7.3f})  '
-                    'Prec@5: {top5.val:>7.3f} ({top5.avg:>7.3f})'.format(
+                    'Prec@5: {top5.val:>7.3f} ({top5.avg:>7.3f}) '
+                    '{extra}'.format(
                         i, len(loader), batch_time=batch_time,
                         rate_avg=input.size(0) / batch_time.avg,
-                        loss=losses, top1=top1, top5=top5))
+                        loss=losses, top1=top1, top5=top5, extra=extra))
 
     results = OrderedDict(
         top1=round(top1.avg, 4), top1_err=round(100 - top1.avg, 4),
@@ -180,6 +195,9 @@ def validate(args):
 
     logging.info(' * Prec@1 {:.3f} ({:.3f}) Prec@5 {:.3f} ({:.3f})'.format(
        results['top1'], results['top1_err'], results['top5'], results['top5_err']))
+
+    if args.nbdt:
+        analyzer.end_epoch(0)
 
     return results
 
