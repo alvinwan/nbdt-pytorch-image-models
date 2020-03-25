@@ -24,7 +24,19 @@ if args.nbdt != 'none':
     model = cls(model=model, dataset='Imagenet1000', hierarchy='induced-efficientnet_b7b')
 ```
 
-## Results
+## Training and Evaluation
+
+To reproduce our results, **make sure to checkout the `nbdt/` branch**.
+
+```
+# 1. git clone the repository
+
+# 2. install requirements
+cd nbdt-pytorch-image-models && pip install -r requirements.txt
+
+# 3. checkout `nbdt`
+git checkout nbdt
+```
 
 **Training**: For our ImageNet results, we use the hyperparameter settings reported for ImageNet-EdgeTPU-Small found in the original README: [EfficientNet-ES (EdgeTPU-Small) with RandAugment - 78.066 top-1, 93.926 top-5](https://github.com/rwightman/pytorch-image-models#efficientnet-es-edgetpu-small-with-randaugment---78066-top-1-93926-top-5). Note the reported 78.066% is the average of 8 checkpoints, whereas we only use one checkpoint to match the original paper. These settings are reproduced below:
 
