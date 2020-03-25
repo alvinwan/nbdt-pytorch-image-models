@@ -171,7 +171,7 @@ def validate(args):
                     'Time: {batch_time.val:.3f}s ({batch_time.avg:.3f}s, {rate_avg:>7.2f}/s)  '
                     'Loss: {loss.val:>7.4f} ({loss.avg:>6.4f})  '
                     'Prec@1: {top1.val:>7.3f} ({top1.avg:>7.3f})  '
-                    'Prec@5: {top5.val:>7.3f} ({top5.avg:>7.3f}) '.format(
+                    'Prec@5: {top5.val:>7.3f} ({top5.avg:>7.3f})'.format(
                         i, len(loader), batch_time=batch_time,
                         rate_avg=input.size(0) / batch_time.avg,
                         loss=losses, top1=top1, top5=top5))
