@@ -71,7 +71,8 @@ parser.add_argument('--torchscript', dest='torchscript', action='store_true',
                     help='convert model torchscript for inference')
 parser.add_argument('--results-file', default='', type=str, metavar='FILENAME',
                     help='Output csv file for validation results (summary)')
-
+parser.add_argument('--nbdt', choices=('none', 'soft', 'hard'), default='none',
+                    help='Type of NBDT inference to run')
 
 def validate(args):
     # might as well try to validate something
@@ -135,8 +136,10 @@ def validate(args):
     top1 = AverageMeter()
     top5 = AverageMeter()
 
-    from nbdt.model import SoftNBDT
-    model = SoftNBDT(model=model, dataset='Imagenet1000', hierarchy='induced-efficientnet_b7b')
+    from nbdt.model import SoftNBDT, HardNBDT
+    if args.nbdt != 'none':
+        cls = SoftNBDT if args.nbdt == 'soft' else HardNBDT
+        model = cls(model=model, dataset='Imagenet1000', hierarchy='induced-efficientnet_b7b')
 
     model.eval()
     end = time.time()
